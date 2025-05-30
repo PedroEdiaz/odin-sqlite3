@@ -232,6 +232,60 @@ connection closed
 ```
 </details>
 
+## Using SQLCipher instead of vanilla SQLite
+
+This binding can talk to **[SQLCipher](https://github.com/sqlcipher/sqlcipher)** out-of-the-box – you just need to link against `libsqlcipher` (note: this has only been tested on MacOS but should work across platforms):
+
+```sh
+odin build . -define:SQLITE3_USE_SQLCIPHER=true
+```
+
+*Note: Other build flags remain the same. You will need to compile sqlcipher or install from your OS's package manager.*
+
+### 🔐  SQLCipher-only functions
+
+When `USE_SQLCIPHER` is **true** four extra C symbols become available in the `sqlite` package:
+
+| Odin name            | C symbol             | Purpose |
+|----------------------|----------------------|---------|
+| `sqlite.key`         | `sqlite3_key`        | Apply the *initial* key (password or raw binary) to a newly-opened database connection. |
+| `sqlite.key_v2`      | `sqlite3_key_v2`     | Same as above, but lets you specify the schema name (usually `"main"`). |
+| `sqlite.rekey`       | `sqlite3_rekey`      | Re-encrypt the database with a **new** key. |
+| `sqlite.rekey_v2`    | `sqlite3_rekey_v2`   | Same as above, but scoped to a specific attached schema. |
+
+You can also use the bare `PRAGMA key="mypassword"` and `PRAGMA rekey="newpassword"` if desired.
+
+*If you compile without `-define:SQLITE3_USE_SQLCIPHER=true`, you will not be able to access these functions, keeping SQLite builds safe and free from unused exports.*
+
+### Minimal example
+
+```odin
+import "core:c"
+
+main :: proc() {
+    db: ^sqlite.Connection = nil
+
+    // Open the database file.
+    if sqlite.open("./encrypted.sqlite", &db) != .Ok {
+        panic("open failed")
+    }
+    defer sqlite.close(db)
+
+    // Provide the secret for the database. You MUST do this before using it.
+    secret := "Tr0ub4dor&3";
+    if sqlite.key(db, raw_data(secret), cast(c.int)len(secret)) != 0 {
+        // Handle error - note: this will return 0 even if the key is wrong.
+        // You will get an error on the next call if the key is wrong.
+    }
+
+    // ...Everything else is the same as using SQLite...
+
+    // Change the secret for the database.
+    new_secret := "CorrectHorseBatteryStaple";
+    sqlite.rekey(db, raw_data(new_secret), cast(c.int)len(new_secret))
+}
+```
+
 ---
 
 ## Contributions
