@@ -330,6 +330,14 @@ foreign sqlite {
 	sql :: proc "c" (statement: ^Statement) -> cstring ---
 	expanded_sql :: proc "c" (statement: ^Statement) -> cstring ---
 
+	@(require_results)
+	errcode :: proc "c" (db: ^Connection) -> Result_Code ---
+	@(require_results)
+	extended_errcode :: proc "c" (db: ^Connection) -> Result_Code ---
+	errmsg :: proc "c" (db: ^Connection) -> cstring ---
+	errmsg16 :: proc "c" (db: ^Connection) -> cstring ---
+	errstr :: proc "c" (code: Result_Code) -> cstring ---
+
 	// Export SQLCipher-specific functions conditionally.
 	when USE_SQLCIPHER {
 		key :: proc "c" (db: ^Connection, key: rawptr, nKey: c.int) -> c.int ---
