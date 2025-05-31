@@ -247,6 +247,14 @@ Result_Code :: enum (c.int) {
 	IoErr_CorruptFS         = 8458,
 }
 
+DataType :: enum(c.int) {
+	INTEGER = 1,
+	FLOAT  = 2,
+	TEXT   = 3,
+	BLOB   = 4,
+	NULL   = 5,
+}
+
 @(link_prefix = "sqlite3_")
 foreign sqlite {
 	free :: proc "c" (ptr: rawptr) ---
@@ -315,7 +323,7 @@ foreign sqlite {
 	column_int64 :: proc "c" (statement: ^Statement, col_idx: c.int) -> c.int64_t ---
 	column_bytes :: proc "c" (statement: ^Statement, col_idx: c.int) -> c.int ---
 	column_bytes16 :: proc "c" (statement: ^Statement, col_idx: c.int) -> c.int ---
-	column_type :: proc "c" (statement: ^Statement, col_idx: c.int) -> c.int ---
+	column_type :: proc "c" (statement: ^Statement, col_idx: c.int) -> DataType ---
 	column_count :: proc "c" (statement: ^Statement) -> c.int ---
 	column_name :: proc "c" (statement: ^Statement, col_idx: c.int) -> cstring ---
 	commit_hook :: proc "c" (db: ^Connection, cb: proc "c" (ctx: rawptr) -> Result_Code, ctx: rawptr) -> rawptr ---
