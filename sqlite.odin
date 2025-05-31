@@ -10,7 +10,7 @@ Blob :: rawptr
 @(private)
 USE_DYNAMIC_LIB :: #config(SQLITE3_DYNAMIC_LIB, false)
 @(private)
-USE_SYSTEM_LIB :: #config(SQLITE3_SYSTEM_LIB, false)
+USE_SYSTEM_LIB :: #config(SQLITE3_SYSTEM_LIB, true)
 @(private)
 USE_SQLCIPHER :: #config(SQLITE3_USE_SQLCIPHER, false)
 
@@ -26,7 +26,7 @@ when ODIN_OS == .Windows {
 			when USE_SQLCIPHER {
 				foreign import sqlite "system:libsqlcipher.lib"
 			} else {
-				foreign import sqlite "system:libsqlite3.lib.0"
+				foreign import sqlite "system:libsqlite3.lib"
 			}
 		}
 	} else {
@@ -80,7 +80,7 @@ when ODIN_OS == .Windows {
 			when USE_SQLCIPHER {
 				foreign import sqlite "system:libsqlcipher.so"
 			} else {
-				foreign import sqlite "system:libsqlite3.so"
+				foreign import sqlite "system:libsqlite3.so.0"
 			}
 		} else {
 			when USE_SQLCIPHER {
