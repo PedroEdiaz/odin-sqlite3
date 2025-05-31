@@ -138,6 +138,28 @@ Config_Option :: enum (c.int) {
 	Rowid_In_View       = 30,
 }
 
+Open_Flags :: enum {
+	Read_Only = 0,
+	Read_Write,
+	Create,
+	Delete_On_Close,
+	Exclusive,
+	Autoproxy,
+	URI,
+	Memory,
+	Main_DB,
+	Temp_DB,
+	Transient_DB,
+	Main_Journal,
+	Temp_Journal,
+	Subjournal,
+	Super_Journal,
+	No_Mutex,
+	Full_Mutex,
+	Shared_Cache,
+	Private_Cache,
+	WAL,
+}
 
 Result_Code :: enum (c.int) {
 	Ok                      = 0,
@@ -260,14 +282,14 @@ foreign sqlite {
 	free :: proc "c" (ptr: rawptr) ---
 	open :: proc "c" (filename: cstring, db: ^^Connection) -> Result_Code ---
 	open16 :: proc "c" (filename: cstring, db: ^^Connection) -> Result_Code ---
-	open_v2 :: proc "c" (filename: cstring, db: ^^Connection, flags: c.int, z_vfs: cstring) -> Result_Code ---
+	open_v2 :: proc "c" (filename: cstring, db: ^^Connection, flags: bit_set[Open_Flags]={}, z_vfs: cstring = nil) -> Result_Code ---
 	close :: proc "c" (db: ^Connection) -> Result_Code ---
 	close_v2 :: proc "c" (db: ^Connection) -> Result_Code ---
-	prepare :: proc "c" (db: ^Connection, sql: cstring, n_bytes: c.int, statement: ^^Statement, tail: ^^cstring) -> Result_Code ---
-	prepare_v2 :: proc "c" (db: ^Connection, sql: cstring, n_bytes: c.int, statement: ^^Statement, tail: ^^cstring) -> Result_Code ---
+	prepare :: proc "c" (db: ^Connection, sql: cstring, n_bytes: c.int, statement: ^^Statement, tail: ^^cstring = nil) -> Result_Code ---
+	prepare_v2 :: proc "c" (db: ^Connection, sql: cstring, n_bytes: c.int, statement: ^^Statement, tail: ^^cstring = nil) -> Result_Code ---
 	step :: proc "c" (statement: ^Statement) -> Result_Code ---
 	finalize :: proc "c" (statememt: ^Statement) -> Result_Code ---
-	exec :: proc "c" (db: ^Connection, sql: cstring, cb: proc "c" (ctx: rawptr, argc: c.int, argv: [^]cstring, col_names: [^]cstring) -> c.int, ctx: rawptr, err: ^cstring) -> Result_Code ---
+	exec :: proc "c" (db: ^Connection, sql: cstring, cb: proc "c" (ctx: rawptr, argc: c.int, argv: [^]cstring, col_names: [^]cstring) -> c.int = nil, ctx: rawptr = nil, err: ^cstring = nil) -> Result_Code ---
 	changes :: proc "c" (db: ^Connection) -> c.int ---
 	changes64 :: proc "c" (db: ^Connection) -> c.int64_t ---
 	auto_extension :: proc "c" (x_entry_point: proc "c" ()) -> Result_Code ---
@@ -293,7 +315,7 @@ foreign sqlite {
 	bind_parameter_name :: proc "c" (statement: ^Statement, param_idx: c.int) -> cstring ---
 	blob_bytes :: proc "c" (blob: ^Blob) -> c.int ---
 	blob_close :: proc "c" (blob: ^Blob) -> Result_Code ---
-	blob_open :: proc "c" (db: ^Connection, database_name: cstring, table: cstring, column: cstring, row_idx: c.int64_t, flags: c.int, blob: ^^Blob) -> Result_Code ---
+	blob_open :: proc "c" (db: ^Connection, database_name: cstring, table: cstring, column: cstring, row_idx: c.int64_t, flags: bit_set[Open_Flags]={}, blob: ^^Blob) -> Result_Code ---
 	blob_read :: proc "c" (blob: ^Blob, dest: rawptr, n_bytes: c.int, n_bytes_offset: c.int) -> Result_Code ---
 	blob_write :: proc "c" (blob: ^Blob, source: rawptr, n_bytes: c.int, n_bytes_offset: c.int) -> Result_Code ---
 	blob_reopen :: proc "c" (blob: ^Blob, row_id: c.int64_t) -> Result_Code ---
