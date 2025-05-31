@@ -26,7 +26,7 @@ when ODIN_OS == .Windows {
 			when USE_SQLCIPHER {
 				foreign import sqlite "system:libsqlcipher.lib"
 			} else {
-				foreign import sqlite "system:libsqlite3.lib"
+				foreign import sqlite "system:libsqlite3.lib.0"
 			}
 		}
 	} else {
