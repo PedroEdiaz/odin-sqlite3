@@ -138,7 +138,7 @@ Config_Option :: enum (c.int) {
 	Rowid_In_View       = 30,
 }
 
-Destructor_Behavior :: enum (c.int) {
+Destructor_Behavior :: enum (int) {
 	Static    = 0, 
 	Transient = -1,
 }
